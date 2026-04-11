@@ -18,7 +18,7 @@ model tb_campus {
 model tb_category {
   id                 Int                  @id @default(autoincrement())
   name_category      String               @db.VarChar(255)
-  tb_category_objeto tb_category_objeto[]
+  tb_category_objeto tb_category_objeto[] @ignore
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -50,7 +50,7 @@ model tb_object {
   campus_id                                    Int
   create_at                                    DateTime?            @db.Date
   update_at                                    DateTime?            @db.Date
-  tb_category_objeto                           tb_category_objeto[]
+  tb_category_objeto                           tb_category_objeto[] @ignore
   tb_campus                                    tb_campus            @relation(fields: [campus_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_campus")
   tb_user_tb_object_registered_objectTotb_user tb_user              @relation("tb_object_registered_objectTotb_user", fields: [registered_object], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_registered")
   tb_user_tb_object_removed_byTotb_user        tb_user?             @relation("tb_object_removed_byTotb_user", fields: [removed_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_removed")
