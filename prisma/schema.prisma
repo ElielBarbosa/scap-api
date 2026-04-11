@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tb_campus {
+  id        Int         @id @default(autoincrement())
+  address   String      @db.VarChar(255)
+  city      String      @db.VarChar(255)
+  tb_object tb_object[]
+  tb_user   tb_user[]
+}
+
+model tb_category {
+  id                 Int                  @id @default(autoincrement())
+  name_category      String               @db.VarChar(255)
+  tb_category_objeto tb_category_objeto[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tb_category_objeto {
+  tb_category_id Int
+  tb_objeto_id   Int
+  tb_category    tb_category @relation(fields: [tb_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cat_obj_category")
+  tb_object      tb_object   @relation(fields: [tb_objeto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cat_obj_objeto")
+
+  @@ignore
+}
+
+model tb_notification {
+  id       Int     @id @default(autoincrement())
+  user_id  Int
+  messager String? @db.VarChar(255)
+  tb_user  tb_user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_notification_user")
+}
+
+model tb_object {
+  id                                           Int                  @id(map: "tb_objeto_pkey") @default(autoincrement())
+  name_objetct                                 String               @db.VarChar(255)
+  description                                  String?              @db.VarChar(255)
+  status                                       String?              @db.Char(1)
+  location_found                               String?              @db.VarChar(255)
+  object_image                                 String?
+  registered_object                            Int
+  removed_by                                   Int?
+  campus_id                                    Int
+  create_at                                    DateTime?            @db.Date
+  update_at                                    DateTime?            @db.Date
+  tb_category_objeto                           tb_category_objeto[]
+  tb_campus                                    tb_campus            @relation(fields: [campus_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_campus")
+  tb_user_tb_object_registered_objectTotb_user tb_user              @relation("tb_object_registered_objectTotb_user", fields: [registered_object], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_registered")
+  tb_user_tb_object_removed_byTotb_user        tb_user?             @relation("tb_object_removed_byTotb_user", fields: [removed_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_removed")
+}
+
+model tb_user {
+  id                                             Int               @id @default(autoincrement())
+  user_name                                      String            @db.VarChar(255)
+  user_type                                      String            @db.VarChar(255)
+  email                                          String?           @db.VarChar(255)
+  password_hash                                  String?           @db.VarChar(255)
+  campus_id                                      Int
+  update_at                                      DateTime?         @db.Timestamptz(6)
+  create_at                                      DateTime          @default(now()) @db.Timestamptz(6)
+  registration                                   String            @default(dbgenerated("now()")) @db.VarChar(50)
+  tb_notification                                tb_notification[]
+  tb_object_tb_object_registered_objectTotb_user tb_object[]       @relation("tb_object_registered_objectTotb_user")
+  tb_object_tb_object_removed_byTotb_user        tb_object[]       @relation("tb_object_removed_byTotb_user")
+  tb_campus                                      tb_campus         @relation(fields: [campus_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_campus")
+}
