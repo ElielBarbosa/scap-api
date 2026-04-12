@@ -6,7 +6,7 @@ export class UserRepository {
   private _db: PrismaClient = prisma;
   constructor() { }
 
-  async registerUserSchema(dataUser: UserDTO): Promise<tb_user | null> {
+  async registerUser(dataUser: UserDTO): Promise<tb_user | null> {
     const newUser = (await this._db.$queryRaw`
     INSERT INTO tb_user (
       user_name,
