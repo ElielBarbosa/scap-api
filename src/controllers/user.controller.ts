@@ -4,7 +4,7 @@ import { UserDTO } from "../entities/IUser.js";
 
 export class UserController {
   private _userRepository: UserRepository = new UserRepository();
-  constructor() {}
+  constructor() { }
 
   registerNewUser = async (req: Request, res: Response) => {
     const newUserData: UserDTO = req.body as UserDTO;
@@ -17,7 +17,7 @@ export class UserController {
       }
       return res.json(newUserRegistred).status(201);
     } catch (err) {
-      console.log(err);
+      return res.json(err).status(500);
     }
   };
 
@@ -27,7 +27,7 @@ export class UserController {
       const user: UserDTO | null = await this._userRepository.getUserById(idUser);
 
       if (!user) {
-       return res.json({ messager: "Usuário não encontrado" }).status(300);
+        return res.json({ messager: "Usuário não encontrado" }).status(300);
       }
       return res.json(user).status(200);
 

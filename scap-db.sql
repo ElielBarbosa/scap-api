@@ -3,33 +3,28 @@
 BEGIN;
 
 
+CREATE TABLE IF NOT EXISTS public.tb_user
+(
+    id serial NOT NULL,
+    user_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    user_type character varying(255) COLLATE pg_catalog."default" NOT NULL DEFAULT 1,
+    email character varying(255) COLLATE pg_catalog."default",
+    password_hash character varying(255) COLLATE pg_catalog."default",
+    campus_id integer NOT NULL,
+    update_at timestamp with time zone DEFAULT now(),
+    create_at timestamp with time zone NOT NULL DEFAULT now(),
+    registration character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT tb_user_pkey PRIMARY KEY (id),
+    UNIQUE (email),
+    UNIQUE (registration)
+);
+
 CREATE TABLE IF NOT EXISTS public.tb_campus
 (
     id serial NOT NULL,
     address character varying(255) COLLATE pg_catalog."default" NOT NULL,
     city character varying(255) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT tb_campus_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS public.tb_category
-(
-    id serial NOT NULL,
-    name_category character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT tb_category_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS public.tb_category_objeto
-(
-    tb_category_id integer NOT NULL,
-    tb_objeto_id integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS public.tb_notification
-(
-    id serial NOT NULL,
-    user_id integer NOT NULL,
-    messager character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT tb_notification_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS public.tb_object
@@ -43,42 +38,36 @@ CREATE TABLE IF NOT EXISTS public.tb_object
     registered_object integer NOT NULL,
     removed_by integer,
     campus_id integer NOT NULL,
-    create_at date,
-    update_at date,
+    create_at date DEFAULT now(),
+    update_at date DEFAULT now(),
     CONSTRAINT tb_objeto_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS public.tb_user
+CREATE TABLE IF NOT EXISTS public.tb_category_objeto
 (
-    id serial NOT NULL,
-    user_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    user_type character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    email character varying(255) COLLATE pg_catalog."default",
-    password_hash character varying(255) COLLATE pg_catalog."default",
-    campus_id integer NOT NULL,
-    update_at timestamp with time zone,
-    create_at timestamp with time zone NOT NULL DEFAULT NOW(),
-    registration character varying(50) NOT NULL DEFAULT NOW(),
-    CONSTRAINT tb_user_pkey PRIMARY KEY (id)
+    tb_category_id integer NOT NULL,
+    tb_objeto_id integer NOT NULL
 );
 
-ALTER TABLE IF EXISTS public.tb_category_objeto
-    ADD CONSTRAINT fk_cat_obj_category FOREIGN KEY (tb_category_id)
-    REFERENCES public.tb_category (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
+CREATE TABLE IF NOT EXISTS public.tb_category
+(
+    id serial NOT NULL,
+    name_category character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT tb_category_pkey PRIMARY KEY (id),
+    UNIQUE (name_category)
+);
 
+CREATE TABLE IF NOT EXISTS public.tb_notification
+(
+    id serial NOT NULL,
+    user_id integer NOT NULL,
+    messager character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT tb_notification_pkey PRIMARY KEY (id)
+);
 
-ALTER TABLE IF EXISTS public.tb_category_objeto
-    ADD CONSTRAINT fk_cat_obj_objeto FOREIGN KEY (tb_objeto_id)
-    REFERENCES public.tb_object (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION;
-
-
-ALTER TABLE IF EXISTS public.tb_notification
-    ADD CONSTRAINT fk_notification_user FOREIGN KEY (user_id)
-    REFERENCES public.tb_user (id) MATCH SIMPLE
+ALTER TABLE IF EXISTS public.tb_user
+    ADD CONSTRAINT fk_user_campus FOREIGN KEY (campus_id)
+    REFERENCES public.tb_campus (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION;
 
@@ -104,9 +93,23 @@ ALTER TABLE IF EXISTS public.tb_object
     ON DELETE NO ACTION;
 
 
-ALTER TABLE IF EXISTS public.tb_user
-    ADD CONSTRAINT fk_user_campus FOREIGN KEY (campus_id)
-    REFERENCES public.tb_campus (id) MATCH SIMPLE
+ALTER TABLE IF EXISTS public.tb_category_objeto
+    ADD CONSTRAINT fk_cat_obj_category FOREIGN KEY (tb_category_id)
+    REFERENCES public.tb_category (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
+ALTER TABLE IF EXISTS public.tb_category_objeto
+    ADD CONSTRAINT fk_cat_obj_objeto FOREIGN KEY (tb_objeto_id)
+    REFERENCES public.tb_object (id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION;
+
+
+ALTER TABLE IF EXISTS public.tb_notification
+    ADD CONSTRAINT fk_notification_user FOREIGN KEY (user_id)
+    REFERENCES public.tb_user (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE NO ACTION;
 

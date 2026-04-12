@@ -17,7 +17,7 @@ model tb_campus {
 
 model tb_category {
   id                 Int                  @id @default(autoincrement())
-  name_category      String               @db.VarChar(255)
+  name_category      String               @unique @db.VarChar(255)
   tb_category_objeto tb_category_objeto[] @ignore
 }
 
@@ -48,8 +48,8 @@ model tb_object {
   registered_object                            Int
   removed_by                                   Int?
   campus_id                                    Int
-  create_at                                    DateTime?            @db.Date
-  update_at                                    DateTime?            @db.Date
+  create_at                                    DateTime?            @default(now()) @db.Date
+  update_at                                    DateTime?            @default(now()) @db.Date
   tb_category_objeto                           tb_category_objeto[] @ignore
   tb_campus                                    tb_campus            @relation(fields: [campus_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_campus")
   tb_user_tb_object_registered_objectTotb_user tb_user              @relation("tb_object_registered_objectTotb_user", fields: [registered_object], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_objeto_registered")
@@ -59,13 +59,13 @@ model tb_object {
 model tb_user {
   id                                             Int               @id @default(autoincrement())
   user_name                                      String            @db.VarChar(255)
-  user_type                                      String            @db.VarChar(255)
-  email                                          String?           @db.VarChar(255)
+  user_type                                      Int               @default(1)
+  email                                          String?           @unique @db.VarChar(255)
   password_hash                                  String?           @db.VarChar(255)
   campus_id                                      Int
-  update_at                                      DateTime?         @db.Timestamptz(6)
+  update_at                                      DateTime?         @default(now()) @db.Timestamptz(6)
   create_at                                      DateTime          @default(now()) @db.Timestamptz(6)
-  registration                                   String            @default(dbgenerated("now()")) @db.VarChar(50)
+  registration                                   String            @unique @db.VarChar(50)
   tb_notification                                tb_notification[]
   tb_object_tb_object_registered_objectTotb_user tb_object[]       @relation("tb_object_registered_objectTotb_user")
   tb_object_tb_object_removed_byTotb_user        tb_object[]       @relation("tb_object_removed_byTotb_user")
