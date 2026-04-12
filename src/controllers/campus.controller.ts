@@ -5,7 +5,8 @@ import { prisma } from "../prisma.js";
 
 export class CampusController {
   private campusRepository: CampusRepository = new CampusRepository();
-  constructor() {}
+
+  constructor() { }
 
   registerNewCampus = async (req: Request, res: Response) => {
     const { address, city } = req.body;
@@ -23,6 +24,7 @@ export class CampusController {
         .status(201);
     } catch (err) {
       console.log(err);
+      return res.json({ Error: "Algo deu errado no registro" }).status(500);
     }
 
     //verificar se o usuario existe
