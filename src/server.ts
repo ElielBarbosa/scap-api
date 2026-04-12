@@ -3,6 +3,7 @@ import cors from "cors";
 import { campusRouter } from "./routes/campus.routes";
 
 import { errorHandle } from "./middlewares/errorHandler.middleware";
+import { userRouter } from "./routes/user.routes";
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/v1/campus", campusRouter);
+app.use("/api/v1/user", userRouter);
 
 app.use(errorHandle);
 
