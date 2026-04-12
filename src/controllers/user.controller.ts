@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { UserRepository } from "../repositories/user.repository.js";
-import { UserDTO } from "../entities/IUser.js";
+import { UserCreateDTO } from "../entities/IUser.js";
 
 export class UserController {
   private _userRepository: UserRepository = new UserRepository();
   constructor() { }
 
   registerNewUser = async (req: Request, res: Response) => {
-    const newUserData: UserDTO = req.body as UserDTO;
+    const newUserData: UserCreateDTO = req.body as UserCreateDTO;
     try {
       const newUserRegistred =
         await this._userRepository.registerUser(newUserData);
@@ -24,13 +24,13 @@ export class UserController {
   getUser = async (req: Request, res: Response) => {
     const idUser = Number(req.params.id);
     try {
-      const user: UserDTO | null = await this._userRepository.getUserById(idUser);
+      const user: UserCreateDTO | null =
+        await this._userRepository.getUserById(idUser);
 
       if (!user) {
         return res.json({ messager: "Usuário não encontrado" }).status(300);
       }
       return res.json(user).status(200);
-
     } catch (err) {
       console.log(err);
     }

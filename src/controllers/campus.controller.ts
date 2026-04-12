@@ -6,7 +6,7 @@ import { prisma } from "../prisma.js";
 export class CampusController {
   private campusRepository: CampusRepository = new CampusRepository();
 
-  constructor() { }
+  constructor() {}
 
   registerNewCampus = async (req: Request, res: Response) => {
     const { address, city } = req.body;
