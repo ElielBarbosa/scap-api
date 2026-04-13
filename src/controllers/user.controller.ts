@@ -22,10 +22,15 @@ export class UserController {
   };
 
   getUser = async (req: Request, res: Response) => {
-    const idUser = Number(req.params.id);
+    const userIdReq = Number(req.params.id);
+    //console.log("ID do usuário solicitado:", idUser, (req as any).userId);
+
+    if ((req as any).userId !== userIdReq) {
+      return res.json({ message: "Acesso negado" }).status(403);
+    }
+
     try {
-      const user: UserCreateDTO | null =
-        await this._userRepository.getUserById(idUser);
+      const user: UserCreateDTO | null = await this._userRepository.getUserById(userIdReq);
 
       if (!user) {
         return res.json({ messager: "Usuário não encontrado" }).status(300);
