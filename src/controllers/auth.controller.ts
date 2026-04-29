@@ -26,7 +26,7 @@ export class AuthController {
     const user: UserLoginDTO | null = await this._userRepository.login(UserLogin);
 
     if (!user) {
-      return res.status(401).json({ message: "Login ou senha invalidos." });
+      return res.status(401).json({ message: "Combinação de login e senha inválida." });
     }
 
     const token = this.bearerToken(user);

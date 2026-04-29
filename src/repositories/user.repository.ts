@@ -1,6 +1,6 @@
 import { PrismaClient, tb_user } from "@prisma/client";
 import { prisma } from "../prisma";
-import { UserCreateDTO, UserDTO, UserLoginDTO } from "../entities/IUser";
+import { ConsultUserDTO, UserCreateDTO, UserDTO, UserLoginDTO } from "../entities/IUser";
 import { unknown } from "zod";
 
 export class UserRepository {
@@ -18,7 +18,7 @@ export class UserRepository {
     ) values (
      ${dataUser.username},
      ${dataUser.email},
-     ${dataUser.passwordHash},
+     ${dataUser.password},
      ${dataUser.campusId},
      ${dataUser.registration}
     ) RETURNING *;
@@ -95,5 +95,19 @@ export class UserRepository {
       email: user[0].email,
       password: user[0].password_hash,
     };
+  }
+
+  async consultUser(consultUser: ConsultUserDTO): Promise<boolean> {
+    const row = await this._db.$queryRaw`
+    SELECT email, registration 
+    FROM tb_user
+    WHERE email = ${consultUser.email}
+    OR registration = ${consultUser.registration};
+    ` as ConsultUserDTO[];
+
+    if (row.length === 0) {
+      return false;
+    }
+    return true;
   }
 }

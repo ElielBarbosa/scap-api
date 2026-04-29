@@ -15,3 +15,4 @@ const userController: UserController = new UserController();
 // userRouter.get("/:id", userController.getUser);
 userRouter.post("/", validateBody(userRegisterSchema), userController.registerNewUser);
 userRouter.get("/:id", security, userController.getUser);
+userRouter.post("/verify", userController.verifyUserExist);

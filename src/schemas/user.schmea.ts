@@ -12,7 +12,7 @@ export const userRegisterSchema = z.object({
     .min(5, "E-mail deve ter no mínimo 5 caracteres")
     .max(100, "E-mail deve ter no máximo 100 caracteres")
     .regex(emailRegex, "Email inválido"),
-  passwordHash: z
+  password: z
     .string()
     .min(6, "Senha deve ter no minimo 6 caracteres")
     .max(255, "Senha deve ter no máximo 255 caracteres"),

@@ -6,8 +6,7 @@ export enum UserType {
 export interface UserCreateDTO {
   username: string;
   email: string;
-  passwordHash: string;
-  userType: UserType;
+  password: string;
   campusId: number;
   registration: string;
 }
@@ -25,4 +24,8 @@ export interface UserLoginDTO {
   userId: number | null;
   email: string | null;
   password: string | null;
+}
+export interface ConsultUserDTO {
+  email: string | null;
+  registration: string | null;
 }

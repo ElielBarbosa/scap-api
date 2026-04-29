@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserRepository } from "../repositories/user.repository.js";
-import { UserCreateDTO } from "../entities/IUser.js";
+import { ConsultUserDTO, UserCreateDTO } from "../entities/IUser.js";
 
 export class UserController {
   private _userRepository: UserRepository = new UserRepository();
@@ -8,15 +8,17 @@ export class UserController {
 
   registerNewUser = async (req: Request, res: Response) => {
     const newUserData: UserCreateDTO = req.body as UserCreateDTO;
+    console.log(newUserData)
     try {
-      const newUserRegistred =
-        await this._userRepository.registerUser(newUserData);
+      const newUserRegistred = await this._userRepository.registerUser(newUserData);
 
       if (newUserRegistred === null) {
-        return res.json({ Error: "Novo usuario não registrado" }).status(500);
+        throw new Error("Erro ao registrar novo usuário");
+        // return res.json({ Error: "Novo usuario não registrado" }).status(500);
       }
       return res.json(newUserRegistred).status(201);
     } catch (err) {
+      //corrigir depois, nãoexibir o erro do banco diretamente
       return res.json(err).status(500);
     }
   };
@@ -39,5 +41,20 @@ export class UserController {
     } catch (err) {
       console.log(err);
     }
+
   };
+
+  verifyUserExist = async (req: Request, res: Response) => {
+    const consult: ConsultUserDTO | undefined = req.body;
+    console.log("Consult DTO recebido:", consult);
+
+    if (consult) {
+      const userExist = await this._userRepository.consultUser(consult);
+
+      if (userExist === true) {
+        return res.json({ exist: userExist }).status(200);
+      }
+      return res.json({ exist: userExist }).status(401);
+    }
+  }
 }

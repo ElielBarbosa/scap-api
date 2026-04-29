@@ -14,4 +14,5 @@ campusRouter.post(
   validateBody(dataCampus),
   campusController.registerNewCampus,
 );
+
 campusRouter.get("/", campusController.getAllCampus);
