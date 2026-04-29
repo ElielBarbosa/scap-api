@@ -9,8 +9,10 @@
     "dev": "tsx watch --ignore dist --ignore node_modules src/server.ts",
     "prettier": "npx prettier --write .",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "seed": "node prisma/seed.js"
   },
+  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ElielBarbosa/scap-api.git"

@@ -6,7 +6,7 @@ import { prisma } from "../prisma.js";
 export class CampusController {
   private campusRepository: CampusRepository = new CampusRepository();
 
-  constructor() {}
+  constructor() { }
 
   registerNewCampus = async (req: Request, res: Response) => {
     const { address, city } = req.body;
@@ -36,5 +36,17 @@ export class CampusController {
     const campusList: CampusDTO[] | null =
       await this.campusRepository.getCampusList();
     res.json(campusList).status(200);
+  };
+  getCampusById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const campus: CampusDTO | null = await this.campusRepository.getCampusById(
+      Number(id),
+    );
+
+    if (!campus) {
+      return res.json({ message: "Campus não encontrado" }).status(404);
+    }
+
+    res.json(campus).status(200);
   };
 }

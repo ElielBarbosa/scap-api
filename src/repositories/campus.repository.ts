@@ -4,7 +4,7 @@ import { prisma } from "../prisma.js";
 
 export class CampusRepository {
   private db: PrismaClient = prisma;
-  constructor() {}
+  constructor() { }
 
   async registerCampus(address: string, city: string): Promise<number> {
     const idNewCampus: number = (await this.db.$queryRaw`
@@ -30,5 +30,17 @@ export class CampusRepository {
     }
 
     return campusList;
+  }
+
+  async getCampusById(id: number): Promise<CampusDTO | null> {
+    const campus: CampusDTO[] = (await this.db.$queryRaw`
+    SELECT * FROM tb_campus WHERE id = ${id};
+    `) as CampusDTO[];
+
+    if (campus.length == 0) {
+      return null;
+    }
+
+    return campus[0];
   }
 }

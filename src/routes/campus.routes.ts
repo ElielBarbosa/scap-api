@@ -10,9 +10,10 @@ const campusController: CampusController = new CampusController();
 
 // userRouter.get("/:id", userController.getUser);
 campusRouter.post(
-  "/register",
+  "/",
   validateBody(dataCampus),
   campusController.registerNewCampus,
 );
 
 campusRouter.get("/", campusController.getAllCampus);
+campusRouter.get("/:id", campusController.getCampusById);

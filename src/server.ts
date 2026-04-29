@@ -7,6 +7,8 @@ import { errorHandle } from "./middlewares/errorHandler.middleware";
 import { userRouter } from "./routes/user.routes";
 import { authRoutes } from "./routes/auth.routes";
 import { security } from "./middlewares/auth.middleware";
+import { object } from "zod";
+import { objectRouter } from "./routes/object.routes";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,6 +21,7 @@ app.use("/api/v1/auth", authRoutes);
 
 app.use("/api/v1/campus", campusRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/object", objectRouter);
 //app.use(security);
 
 app.use(errorHandle);
