@@ -3,92 +3,93 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Iniciando seed de objetos...');
+  console.log('✨ Iniciando limpeza do banco...');
+  // Limpa as tabelas na ordem correta para não quebrar as constraints
+  await prisma.$executeRaw`TRUNCATE TABLE "tb_notification", "tb_category_objeto", "tb_object", "tb_user", "tb_category", "tb_campus" RESTART IDENTITY CASCADE;`;
 
-  const objects = [
-    {
-      name: 'iPhone 13',
-      description: 'Cor azul, capa transparente, encontrado na praça de alimentação',
-      status: '1',
-      location_found: 'Praça de Alimentação',
-      object_image: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d',
-      registered_object: 2,
-      removed_by: 2,
-      campus_id: 1
-    },
-    {
-      name: 'Chave de Carro',
-      description: 'Chave canivete Volkswagen com chaveiro do Star Wars',
-      status: '1',
-      location_found: 'Estacionamento Norte',
-      object_image: 'https://images.unsplash.com/photo-1582139329536-e7284fece509',
-      registered_object: 2,
-      removed_by: 2,
-      campus_id: 1
-    },
-    {
-      name: 'Notebook Dell',
-      description: 'Modelo Inspiron 15, preto, esquecido em cima da mesa',
-      status: '1',
-      location_found: 'Biblioteca - Sala 04',
-      object_image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853',
-      registered_object: 2,
-      removed_by: 2,
-      campus_id: 1
-    },
-    {
-      name: 'Garrafa Térmica',
-      description: 'Garrafa Stanley verde militar, com adesivos',
-      status: '1',
-      location_found: 'Ginásio de Esportes',
-      object_image: 'https://images.unsplash.com/photo-1602143399827-bd95967c35ac',
-      registered_object: 2,
-      removed_by: 2, // ID de quem devolveu
-      campus_id: 1
-    },
-    {
-      name: 'Carteira de Couro',
-      description: 'Carteira marrom contendo documentos de "João Silva"',
-      status: '1',
-      location_found: 'Corredor Bloco C',
-      object_image: 'https://images.unsplash.com/photo-1627123424574-724758594e93',
-      registered_object: 2,
-      removed_by: 2,
-      campus_id: 1
-    }
+  console.log('🌱 Semeando Campus...');
+  const campusData = [
+    { city: 'Aracaju', address: 'Av. Marechal Rondon, s/n' },
+    { city: 'Itabaiana', address: 'Av. Vereador Olímpio Grande' },
+    { city: 'Lagarto', address: 'Av. Governador Marcelo Déda' },
+    { city: 'São Cristóvão', address: 'Rua de Aracaju, s/n' },
+    { city: 'Estância', address: 'Rua General Calazans' },
   ];
 
-  // Usando um loop para inserir cada objeto
-  for (const obj of objects) {
-    await prisma.$queryRaw`
-      INSERT INTO tb_object (
-        name_objetct, 
-        description,
-        status,
-        location_found,
-        object_image,       
-        registered_object,  
-        removed_by,         
-        campus_id           
-      ) VALUES (
-        ${obj.name},
-        ${obj.description},
-        ${obj.status},
-        ${obj.location_found},
-        ${obj.object_image},
-        ${obj.registered_object},
-        ${obj.removed_by},
-        ${obj.campus_id}
-      );
+  const createdCampuses = [];
+  for (const c of campusData) {
+    const saved = await prisma.tb_campus.create({ data: c });
+    createdCampuses.push(saved);
+  }
+
+  console.log('🌱 Semeando Usuários...');
+  const createdUsers = [];
+  for (let i = 0; i < 5; i++) {
+    const user = await prisma.tb_user.create({
+      data: {
+        user_name: `Usuário ${i + 1}`,
+        email: `usuario${i + 1}@email.com`,
+        registration: `REGISTRATION-${100 + i}`,
+        password_hash: 'hash_padrao_123',
+        user_type: 2, // Mantido como String. Se seu banco pedir Int, mude para: 1
+        campus_id: createdCampuses[i].id,
+      },
+    });
+    createdUsers.push(user);
+  }
+
+  console.log('🌱 Semeando Categorias...');
+  const categoryNames = ['Eletrônicos', 'Documentos', 'Vestuário', 'Chaves', 'Outros'];
+  const createdCategories = [];
+  for (const name of categoryNames) {
+    const cat = await prisma.tb_category.create({ data: { name_category: name } });
+    createdCategories.push(cat);
+  }
+
+  console.log('🌱 Semeando Objetos...');
+  const createdObjects = [];
+  const objectNames = ['iPhone 13', 'Carteira de Couro', 'Chave de Carro', 'Casaco Moletom', 'Mochila'];
+
+  for (let i = 0; i < 5; i++) {
+    const obj = await prisma.tb_object.create({
+      data: {
+        name_objetct: objectNames[i],
+        description: `Descrição do item ${objectNames[i]}`,
+        status: 'A', // 'A' para Achado
+        location_found: 'Setor de Vivência',
+        object_image: 'https://placehold.co/400',
+        registered_object: createdUsers[i].id,
+        campus_id: createdCampuses[i].id,
+      },
+    });
+    createdObjects.push(obj);
+  }
+
+  console.log('🌱 Relacionando Objetos e Categorias...');
+  // Usando SQL puro porque a tabela tb_category_objeto não tem ID próprio
+  for (let i = 0; i < 5; i++) {
+    await prisma.$executeRaw`
+      INSERT INTO "tb_category_objeto" (tb_category_id, tb_objeto_id) 
+      VALUES (${createdCategories[i].id}, ${createdObjects[i].id});
     `;
   }
 
-  console.log(`✅ Seed finalizado! ${objects.length} objetos inseridos.`);
+  console.log('🌱 Semeando Notificações...');
+  for (let i = 0; i < 5; i++) {
+    await prisma.tb_notification.create({
+      data: {
+        user_id: createdUsers[i].id,
+        messager: `Olá, um novo objeto (${objectNames[i]}) foi cadastrado no seu campus!`,
+      },
+    });
+  }
+
+  console.log('✅ Seed finalizado com sucesso (5 registros por tabela)!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Erro ao executar seed:', e);
+    console.error('❌ Erro durante o seed:', e);
     process.exit(1);
   })
   .finally(async () => {

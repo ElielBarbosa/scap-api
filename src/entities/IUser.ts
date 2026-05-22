@@ -19,12 +19,34 @@ export interface UserDTO {
   campusId: number;
   registration: string;
 }
+export interface UserAutoLoginDTO {
+  id: number;
+  username: string;
+  email: string;
+  userType: number;
+  campusId: number;
+  registration: string;
+}
 
 export interface UserLoginDTO {
   userId: number | null;
   email: string | null;
   password: string | null;
 }
+export interface UserAutenticateDTO {
+  username: string;
+  userId: number;
+  userType: number;
+  campusId: number;
+  email: string | null;
+}
+export interface UserTokenSigntureDTO {
+  userId: number;
+  userType: number;
+  campusId: number;
+  email: string | null;
+}
+
 export interface ConsultUserDTO {
   email: string | null;
   registration: string | null;

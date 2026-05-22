@@ -33,6 +33,8 @@ export class CampusController {
   };
 
   getAllCampus = async (req: Request, res: Response) => {
+    const authHeader = req.headers.authorization;
+    console.log(authHeader)
     const campusList: CampusDTO[] | null =
       await this.campusRepository.getCampusList();
     res.json(campusList).status(200);

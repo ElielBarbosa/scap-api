@@ -1,13 +1,13 @@
 import { PrismaClient, tb_user } from "@prisma/client";
 import { prisma } from "../prisma";
-import { ConsultUserDTO, UserCreateDTO, UserDTO, UserLoginDTO } from "../entities/IUser";
-import { unknown } from "zod";
+import { ConsultUserDTO, UserAutenticateDTO, UserCreateDTO, UserDTO, UserLoginDTO } from "../entities/IUser";
+
 
 export class UserRepository {
   private _db: PrismaClient = prisma;
   constructor() { }
 
-  async registerUser(dataUser: UserCreateDTO): Promise<tb_user | null> {
+  async registerUser(dataUser: UserCreateDTO): Promise<UserAutenticateDTO | null> {
     const newUser = (await this._db.$queryRaw`
     INSERT INTO tb_user (
       user_name,
@@ -27,7 +27,15 @@ export class UserRepository {
     if (newUser.length === 0) {
       return null;
     }
-    return newUser[0];
+
+    const user: UserAutenticateDTO = {
+      username: newUser[0].user_name,
+      userId: newUser[0].id,
+      userType: newUser[0].user_type,
+      campusId: newUser[0].campus_id,
+      email: newUser[0].email
+    }
+    return user;
   }
 
   async getUserById(id: number): Promise<UserCreateDTO | null> {
@@ -37,7 +45,6 @@ export class UserRepository {
       user_name, 
       user_type, 
       email, 
-      password_hash,
       campus_id,
       registration
     FROM 
@@ -74,12 +81,14 @@ export class UserRepository {
     return user[0];
   }
 
-  async login(userLogin: UserLoginDTO): Promise<UserLoginDTO | null> {
+  async login(userLogin: UserLoginDTO): Promise<UserAutenticateDTO | null> {
     const user = (await this._db.$queryRaw`
     SELECT
       id,
-      email,
-      password_hash
+      campus_id,
+      user_type,
+      user_name,
+      email
     FROM
       tb_user
     WHERE
@@ -92,8 +101,10 @@ export class UserRepository {
 
     return {
       userId: user[0].id,
+      username: user[0].user_name,
+      campusId: user[0].campus_id,
+      userType: user[0].user_type,
       email: user[0].email,
-      password: user[0].password_hash,
     };
   }
 

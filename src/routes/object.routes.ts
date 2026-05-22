@@ -3,17 +3,15 @@ import { validateBody } from "../middlewares/validate.middleware.js";
 import { dataObjectRegister } from "../schemas/object.schema.js";
 import { ObjectController } from "../controllers/object.controller.js";
 
+import configureUpload from "../utils/multerConfig.js";
+
 export const objectRouter = Router();
+const objectController = new ObjectController();
 
-const objectController: ObjectController = new ObjectController();
+const upload = configureUpload();
 
-objectRouter.post(
-  "/",
-  validateBody(dataObjectRegister),
-  objectController.registerNewObject,
-);
-
-objectRouter.get("/", objectController.getAllObjects);
+objectRouter.post("/", upload.single('image'), objectController.registerNewObject);
+objectRouter.get("/campus/:id", objectController.getAllObjectsByCampus);
 objectRouter.get("/:id", objectController.getObjectById);
 objectRouter.put("/:id", objectController.updateObjectById);
 objectRouter.delete("/:id", objectController.deleteObjectById);

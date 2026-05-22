@@ -9,6 +9,7 @@ import { authRoutes } from "./routes/auth.routes";
 import { security } from "./middlewares/auth.middleware";
 import { object } from "zod";
 import { objectRouter } from "./routes/object.routes";
+import { uploadRouter } from "./routes/upload.routes";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,13 +17,14 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.use('/uploads', express.static('uploads'));
+
 app.use("/api/v1/auth", authRoutes);
 
-
+//app.use(security);
 app.use("/api/v1/campus", campusRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/object", objectRouter);
-//app.use(security);
 
 app.use(errorHandle);
 
